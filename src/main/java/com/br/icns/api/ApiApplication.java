@@ -1,5 +1,4 @@
 package com.br.icns.api;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -13,6 +12,7 @@ public class ApiApplication {
 		System.out.println(System.getenv("PASSWORD"));
 		System.out.println(System.getenv("PORT"));
 		System.out.println(System.getenv("BD"));
+		System.out.println(System.getenv("IP_BD"));
 		SpringApplication.run(ApiApplication.class, args);
 	}
 
