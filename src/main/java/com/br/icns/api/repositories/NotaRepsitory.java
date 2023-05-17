@@ -15,4 +15,6 @@ public interface NotaRepsitory extends JpaRepository<Notas,UUID> {
     boolean existsNotaByKeyNota(String keyNota);
 
     Notas findNotaByIdNotas(UUID uuid);
+
+    Notas findNotasByKeyNota(String id);
 }

@@ -1,4 +1,4 @@
-package com.br.icns.api.controllers.nota;
+package com.br.icns.api.controllers;
 import com.br.icns.api.dtos.NotasDTO;
 import com.br.icns.api.models.Notas;
 import com.br.icns.api.models.User;
@@ -44,13 +44,10 @@ public class NotaController {
     @GetMapping("/{id}")
     public ResponseEntity<Object> findNotaByIdNotas(@PathVariable String id){
         try{
-            UUID uuid = UUID.fromString(id);
-            Optional<Notas> nota = Optional.ofNullable(notaService.findNotaByIdNotas(uuid));
-            if(nota.isEmpty()){
-               return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"Conflict\":\"Não encontrado \"}");
-            }
+            Optional<Notas> nota = getNotas(id);
+            ResponseEntity<Object> NOT_FOUND = getObjectResponseEntity(nota);
+            if (NOT_FOUND != null) return NOT_FOUND;
             return ResponseEntity.ok().body(nota);
-
         }catch(IllegalArgumentException e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"Conflict\":\""+e.getMessage()+"\"}");
         }
@@ -79,11 +76,9 @@ public class NotaController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> deleteNota(@PathVariable String id) {
         try {
-            UUID uuid = UUID.fromString(id);
-            Optional<Notas> nota = Optional.ofNullable(notaService.findNotaByIdNotas(uuid));
-            if(nota.isEmpty()){
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"Conflict\":\"Não encontrado \"}");
-            }
+            Optional<Notas> nota = getNotas(id);
+            ResponseEntity<Object> NOT_FOUND = getObjectResponseEntity(nota);
+            if (NOT_FOUND != null) return NOT_FOUND;
             notaService.delete(nota.get());
             return ResponseEntity.ok().body("{\"message\":\"ok!\"}");
 
@@ -92,6 +87,35 @@ public class NotaController {
         }
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PutMapping("/{id}")
+    public ResponseEntity<Object> updateNota(@PathVariable String id, @RequestBody @Valid NotasDTO notasDTO) {
+        try {
+            Optional<Notas> nota = getNotas(id);
+            ResponseEntity<Object> NOT_FOUND = getObjectResponseEntity(nota);
+            if (NOT_FOUND != null) return NOT_FOUND;
+            Notas saveNewNota = nota.get();
+            saveNewNota.setDataLastUpdate(LocalDateTime.now(ZoneId.of("UTC")));
+            saveNewNota.setKeyNota(notasDTO.keyNota());
+            saveNewNota.setTotalValue(notasDTO.totalValue());
+            saveNewNota= notaService.save(saveNewNota);
+            return ResponseEntity.ok().body(saveNewNota);
+        }catch(IllegalArgumentException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"Conflict\":\""+e.getMessage()+"\"}");
+        }
+    }
+
+    private static ResponseEntity<Object> getObjectResponseEntity(Optional<Notas> nota) {
+        if(nota.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"Conflict\":\"Não encontrado \"}");
+        }
+        return null;
+    }
+
+    private Optional<Notas> getNotas(String id) {
+        Optional<Notas> nota = Optional.ofNullable(notaService.findNotasByKeyNota(id));
+        return nota;
+    }
 
 
     private User getUserByToken(String bearerToken) {

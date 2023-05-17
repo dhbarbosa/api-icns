@@ -1,4 +1,4 @@
-package com.br.icns.api.controllers.user;
+package com.br.icns.api.controllers;
 
 import com.br.icns.api.dtos.LoginDTO;
 import com.br.icns.api.models.User;
