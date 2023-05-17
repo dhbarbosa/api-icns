@@ -36,7 +36,6 @@ public class User implements UserDetails, Serializable {
     @Column(name="dataCreate", nullable = false)
     private LocalDateTime dateCreate;
 
-
     @Column(name="dataLastUpdate")
     private LocalDateTime dataLastUpdate;
 

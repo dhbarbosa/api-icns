@@ -1,4 +1,4 @@
-package com.br.icns.api.controllers.user;
+package com.br.icns.api.controllers;
 
 import com.br.icns.api.dtos.UserDTO;
 import com.br.icns.api.enums.RoleName;
@@ -21,7 +21,7 @@ import java.time.ZoneId;
 import java.util.*;
 
 @Controller
-@RequestMapping("api/cadastrar")
+@RequestMapping("api/user")
 public class UserController {
 
     @Autowired
@@ -30,30 +30,24 @@ public class UserController {
     private RoleService roleService;
     @Autowired
     private PasswordEncoder passwordEncoder;
-    @PostMapping
+    @PostMapping("/cadastro")
     public ResponseEntity<Object> creatNewUser(@RequestBody @Valid UserDTO userDTO){
         if(userService.existsUserByUsername(userDTO.username())){
             return ResponseEntity.status(HttpStatus.CONFLICT).body("{\"Conflict\":\"O CPF já está em uso!\"}");
         }
-        userDTO = userDTO.setPassword(passwordEncoder.encode(userDTO.password()));
 
-        Set<Role> roles= new HashSet<>();
-        Role role = roleService.findByRoleName(RoleName.ROLE_USER);
-            if (role != null) {
-                roles.add(role);
-            }
+        userDTO = userDTO.setPassword(passwordEncoder.encode(userDTO.password()));
+        Set<Role> roles = Collections.singleton(roleService.findByRoleName(RoleName.ROLE_ADMIN));
+
         var user = new User(
                 userDTO.username(),
                 userDTO.name(),
                 userDTO.password(),
                 LocalDateTime.now(ZoneId.of("UTC")),
                 null,
-                roles
-                );
+                roles);
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.save(user));
     }
-
-
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/{id}")
@@ -61,9 +55,24 @@ public class UserController {
         Optional<User> user = Optional.ofNullable(userService.findByUsername(cpf));
         if(user.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"Conflict\":\"Não encontrado \"}");
-
         }
         return ResponseEntity.ok().body(user);
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PutMapping("/{id}")
+    public  ResponseEntity<Object> updateUser(@PathVariable(name = "id") String cpf,@RequestBody @Valid UserDTO userDTO){
+        Optional<User> user = Optional.ofNullable(userService.findByUsername(cpf));
+        if(user.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"Conflict\":\"Não encontrado \"}");
+        }
+        User userUpdate = user.get();
+        userUpdate.setDataLastUpdate(LocalDateTime.now(ZoneId.of("UTC")));
+        userUpdate.setName(userDTO.name());
+        userUpdate.setUsername(userDTO.username());
+        userUpdate.setPassword(passwordEncoder.encode(userDTO.password()));
+        userUpdate.setRoles(Collections.singleton(new Role(userDTO.roleName())));
+        userService.save(userUpdate);
+        return ResponseEntity.ok().body(userUpdate);
+    }
 }

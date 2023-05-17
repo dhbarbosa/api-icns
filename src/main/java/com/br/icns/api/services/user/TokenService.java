@@ -2,6 +2,7 @@ package com.br.icns.api.services.user;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.br.icns.api.models.User;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,5 +37,5 @@ public class TokenService {
                     .verify(token)
                     .getSubject();
 
-        }
+    }
 }

@@ -1,13 +1,11 @@
 package com.br.icns.api.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.context.annotation.Lazy;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -36,6 +34,9 @@ public class Notas implements Serializable {
 
     @Column(name = "keyNota", nullable = false, unique = true)
     private String keyNota;
+
+    @OneToMany
+    private List<Produtos> produtos;
 
     @ManyToOne
     @JoinColumn(name="idUser")

@@ -37,4 +37,8 @@ public class NotaService {
     public void delete(Notas notas) {
         notaRepsitory.delete(notas);
     }
+
+    public Notas findNotasByKeyNota(String id) {
+        return notaRepsitory.findNotasByKeyNota(id);
+    }
 }
