@@ -1,5 +1,6 @@
 package com.br.icns.api.models;
 
+import com.br.icns.api.dtos.UserDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
@@ -39,10 +40,6 @@ public class User implements UserDetails, Serializable {
     @Column(name="dataLastUpdate")
     private LocalDateTime dataLastUpdate;
 
-    @OneToMany
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private List<Notas> notas = new ArrayList<>();
-
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -51,12 +48,11 @@ public class User implements UserDetails, Serializable {
             inverseJoinColumns = @JoinColumn(name = "idRole", referencedColumnName = "idRole"))
     private Collection<Role> roles = new HashSet<>();
 
-    public User(String username, String name, String password, LocalDateTime utc, List<Notas> notas, Set<Role> roles) {
-        this.username = username;
-        this.name = name;
-        this.password = password;
+    public User(UserDTO userDTO, LocalDateTime utc, Set<Role> roles) {
+        this.username = userDTO.username();
+        this.name = userDTO.name();
+        this.password = userDTO.password();
         this.dateCreate = utc;
-        this.notas = notas;
         this.roles = roles;
     }
 

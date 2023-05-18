@@ -35,16 +35,11 @@ public class UserController {
         if(userService.existsUserByUsername(userDTO.username())){
             return ResponseEntity.status(HttpStatus.CONFLICT).body("{\"Conflict\":\"O CPF já está em uso!\"}");
         }
-
         userDTO = userDTO.setPassword(passwordEncoder.encode(userDTO.password()));
         Set<Role> roles = Collections.singleton(roleService.findByRoleName(RoleName.ROLE_ADMIN));
-
         var user = new User(
-                userDTO.username(),
-                userDTO.name(),
-                userDTO.password(),
+                userDTO,
                 LocalDateTime.now(ZoneId.of("UTC")),
-                null,
                 roles);
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.save(user));
     }

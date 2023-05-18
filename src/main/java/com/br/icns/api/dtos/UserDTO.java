@@ -12,8 +12,6 @@ import java.util.Set;
 
 public record UserDTO(
         @NotBlank(message = "O Username não deve estar em branco!")
-        @Length(max = 14 , message= "Deve ter o tamanho maximo de 14 caracteres!")
-        @Pattern(regexp ="(^\\d{3}\\x2E\\d{3}\\x2E\\d{3}\\x2D\\d{2}$)", message = "O Usuario de ser o seu CPF válido 000.000.000-00")
         String username,
         @NotBlank(message = "O nome não pode ser vazio")
         String name,

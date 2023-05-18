@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public record ProdutosDTO(
@@ -11,7 +12,10 @@ public record ProdutosDTO(
         String nomeProduto,
 
         @NotBlank
-        LocalDateTime dataVencimento,
+        String codProduto,
+
+        @NotNull
+        LocalDate dataVencimento,
         @NotBlank
         String descricao,
 
@@ -21,5 +25,4 @@ public record ProdutosDTO(
         @Valid
         NotasDTO notasDTO
 ) {
-
 }

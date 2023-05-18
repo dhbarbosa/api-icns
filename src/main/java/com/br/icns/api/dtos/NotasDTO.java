@@ -1,4 +1,5 @@
 package com.br.icns.api.dtos;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import org.aspectj.weaver.ast.Not;
 
@@ -7,11 +8,14 @@ public record NotasDTO(
         Double totalValue,
 
         @Size(min = 44, max = 44, message = "A chave deve ter o valor min/max de 44 digitos")
-        String keyNota
-){
-        public NotasDTO(Double totalValue, String keyNota){
-                this.totalValue =totalValue;
-                this.keyNota= keyNota.replace(" ","");
+        String keyNota,
 
+        @Valid
+        EmpresasDTO empresa
+){
+        public NotasDTO(Double totalValue, String keyNota, EmpresasDTO empresa){
+                this.totalValue=totalValue;
+                this.keyNota= keyNota.replace(" ","");
+                this.empresa=empresa;
         }
 }

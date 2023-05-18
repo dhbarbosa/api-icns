@@ -26,6 +26,10 @@ public class Notas implements Serializable {
     @Column(name = "totalValue", nullable = false)
     private Double totalValue;
 
+    @ManyToOne
+    @JoinColumn(name="cnpj")
+    private Empresas empresas;
+
     @Column(name = "dateReceived", nullable = false)
     private LocalDateTime dateReceived;
 
@@ -35,17 +39,15 @@ public class Notas implements Serializable {
     @Column(name = "keyNota", nullable = false, unique = true)
     private String keyNota;
 
-    @OneToMany
-    private List<Produtos> produtos;
-
     @ManyToOne
     @JoinColumn(name="idUser")
     private User receivedBy;
 
-    public Notas(Double totalValue, String keyNota,User receivedBy, LocalDateTime localDateTime){
+    public Notas(Double totalValue, String keyNota,User receivedBy, Empresas empresas,LocalDateTime localDateTime){
         this.totalValue = totalValue;
         this.keyNota = keyNota;
         this.receivedBy = receivedBy;
         this.dateReceived = localDateTime;
+        this.empresas= empresas;
     }
 }

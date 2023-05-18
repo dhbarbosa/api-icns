@@ -1,6 +1,5 @@
 package com.br.icns.api.config.security;
 
-import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.br.icns.api.services.user.TokenService;
 import com.br.icns.api.services.user.UserService;
 import jakarta.servlet.FilterChain;
@@ -8,7 +7,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -28,17 +26,20 @@ public class FilterToken extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         var authorizationHeader = request.getHeader("Authorization");
+        try {
         if(authorizationHeader!=null){
-            try {
+
                 String subject = this.tokenService.getSubject(authorizationHeader);
                 var user= this.userService.findByUsername(subject);
                 var authentication = new UsernamePasswordAuthenticationToken(user,null,user.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-            } catch (Exception e) {
-                response.sendError(HttpStatus.BAD_REQUEST.value(),"Token não válido ");
             }
+            filterChain.doFilter(request,response);
+
+        } catch (Exception e) {
+            filterChain.doFilter(request,response);
         }
 
-        filterChain.doFilter(request,response);
+
     }
 }

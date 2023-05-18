@@ -17,6 +17,12 @@
 		<java.version>17</java.version>
 	</properties>
 	<dependencies>
+		<dependency>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>okhttp</artifactId>
+			<version>4.9.1</version>
+		</dependency>
+
 		<!-- https://mvnrepository.com/artifact/com.auth0/java-jwt -->
 		<dependency>
 			<groupId>com.auth0</groupId>

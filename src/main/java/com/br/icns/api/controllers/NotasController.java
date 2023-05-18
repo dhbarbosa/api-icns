@@ -1,8 +1,11 @@
 package com.br.icns.api.controllers;
+import com.br.icns.api.dtos.EmpresasDTO;
 import com.br.icns.api.dtos.NotasDTO;
+import com.br.icns.api.models.Empresas;
 import com.br.icns.api.models.Notas;
 import com.br.icns.api.models.User;
-import com.br.icns.api.services.nota.NotaService;
+import com.br.icns.api.services.EmpresasService;
+import com.br.icns.api.services.nota.NotasService;
 import com.br.icns.api.services.user.TokenService;
 import com.br.icns.api.services.user.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,30 +17,26 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Controller
 @RequestMapping("api/user/notas")
-public class NotaController {
+public class NotasController {
     @Autowired
-    private NotaService notaService;
+    private NotasService notasService;
     @Autowired
     private UserService userService;
     @Autowired
     private TokenService tokenService;
+    @Autowired
+    private EmpresasService empresasService;
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
     @GetMapping
     public ResponseEntity<Object> getNota(){
-        return ResponseEntity.ok().body(notaService.findAll());
+        return ResponseEntity.ok().body(notasService.findAll());
     }
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
@@ -56,20 +55,26 @@ public class NotaController {
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
     @PostMapping
     public ResponseEntity<Object> saveNota( @Valid @RequestBody NotasDTO notasDTO, HttpServletRequest request){
-        if(notaService.existsNotaByKeyNota(notasDTO.keyNota())){
+        if(notasService.existsNotaByKeyNota(notasDTO.keyNota())){
             return ResponseEntity.status(HttpStatus.CONFLICT).body("{\"Conflict\":\"A Chave da nota, já está em uso! \"}");
-
         }
+
         String bearerToken = request.getHeader("Authorization");
         User user = getUserByToken(bearerToken);
+        Optional<Empresas> empresas = Optional.ofNullable(empresasService.findEmpresasByCnpj(notasDTO.empresa().cnpj()));
+        if(empresas.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"Conflict\":\"Cod. da empresa não encontrada \"}");
+        }
+
         Notas nota = new Notas(
                 notasDTO.totalValue(),
                 notasDTO.keyNota(),
                 user,
+                empresas.get(),
                 LocalDateTime.now(ZoneId.of("UTC")));
 
 
-        return ResponseEntity.ok().body(notaService.save(nota));
+        return ResponseEntity.status(HttpStatus.CREATED).body(notasService.save(nota));
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -79,7 +84,7 @@ public class NotaController {
             Optional<Notas> nota = getNotas(id);
             ResponseEntity<Object> NOT_FOUND = getObjectResponseEntity(nota);
             if (NOT_FOUND != null) return NOT_FOUND;
-            notaService.delete(nota.get());
+            notasService.delete(nota.get());
             return ResponseEntity.ok().body("{\"message\":\"ok!\"}");
 
         }catch(IllegalArgumentException e){
@@ -98,7 +103,7 @@ public class NotaController {
             saveNewNota.setDataLastUpdate(LocalDateTime.now(ZoneId.of("UTC")));
             saveNewNota.setKeyNota(notasDTO.keyNota());
             saveNewNota.setTotalValue(notasDTO.totalValue());
-            saveNewNota= notaService.save(saveNewNota);
+            saveNewNota= notasService.save(saveNewNota);
             return ResponseEntity.ok().body(saveNewNota);
         }catch(IllegalArgumentException e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"Conflict\":\""+e.getMessage()+"\"}");
@@ -113,7 +118,8 @@ public class NotaController {
     }
 
     private Optional<Notas> getNotas(String id) {
-        Optional<Notas> nota = Optional.ofNullable(notaService.findNotasByKeyNota(id));
+        id=id.strip().replace(" ","");
+        Optional<Notas> nota = Optional.ofNullable(notasService.findNotasByKeyNota(id));
         return nota;
     }
 
