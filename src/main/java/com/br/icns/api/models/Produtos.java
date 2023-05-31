@@ -1,6 +1,7 @@
 package com.br.icns.api.models;
 
 import com.br.icns.api.dtos.ProdutosDTO;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,6 +12,9 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -41,10 +45,6 @@ public class Produtos implements Serializable {
 
     @Column(name = "valorUnitario")
     private Double valorUnitario;
-
-    @ManyToOne
-    @JoinColumn(name = "idNotas")
-    private Notas notas;
 
     public Produtos(ProdutosDTO produtosDTO){
         this.nomeProduto=produtosDTO.nomeProduto();

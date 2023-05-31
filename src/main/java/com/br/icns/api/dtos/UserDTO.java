@@ -16,13 +16,10 @@ public record UserDTO(
         @NotBlank(message = "O nome não pode ser vazio")
         String name,
         @NotBlank(message = "A senha não pode ser vazia!")
-        String password,
-
-        RoleName roleName
-
+        String password
 ) {
     public UserDTO setPassword(String password){
-                return new UserDTO(username(), name(),password, roleName());
+                return new UserDTO(username(), name(),password);
     }
 
 }

@@ -47,16 +47,15 @@ public class ProdutosController {
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
     @PostMapping
     public ResponseEntity<Object> saveProdutos(@Valid @RequestBody ProdutosDTO produtosDTO) throws IOException {
-        Optional<Notas> notaExiste = Optional.ofNullable(notasService.findNotasByKeyNota(produtosDTO.notasDTO().keyNota()));
-            if (notaExiste.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"Conflict\":\"Cod. da nota não encontrado \"}");
-            }
-            var newProduto = new Produtos(produtosDTO);
-            newProduto.setNotas(notaExiste.get());
+//        Optional<Notas> notaExiste = Optional.ofNullable(notasService.findNotasByKeyNota(produtosDTO.notasDTO().keyNota()));
+//            if (notaExiste.isEmpty()) {
+//                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"Conflict\":\"Cod. da nota não encontrado \"}");
+//            }
+//            var newProduto = new Produtos(produtosDTO);
+//            newProduto.setNotas(notaExiste.get());
 
-            return ResponseEntity.status(HttpStatus.CREATED).body(produtosService.save(newProduto));
+            return ResponseEntity.status(HttpStatus.CREATED).body("ok!");
         }
-
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{uuid}")
     public ResponseEntity<Object> deleteProdutos(@PathVariable String uuid){

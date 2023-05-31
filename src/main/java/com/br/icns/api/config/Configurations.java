@@ -17,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsUtils;
 
 @Configuration
 @EnableWebSecurity
@@ -31,8 +32,8 @@ public class Configurations {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeHttpRequests()
-                .requestMatchers("/api/cadastrar").permitAll()
-                .requestMatchers("/api/login").permitAll()
+                .requestMatchers(CorsUtils::isPreFlightRequest)
+                .permitAll()
                 .anyRequest().permitAll().and().addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
                 .build();
 

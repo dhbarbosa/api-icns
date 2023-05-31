@@ -1,12 +1,12 @@
 package com.br.icns.api.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 
 @Entity
@@ -43,9 +43,17 @@ public class Notas implements Serializable {
     @JoinColumn(name="idUser")
     private User receivedBy;
 
-    public Notas(Double totalValue, String keyNota,User receivedBy, Empresas empresas,LocalDateTime localDateTime){
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "notas_produtos",
+            joinColumns = @JoinColumn(name = "idNotas", referencedColumnName = "idNotas"),
+            inverseJoinColumns = @JoinColumn(name = "idProdutos", referencedColumnName = "idProdutos"))
+    private List<Produtos> produtos = new ArrayList<>();
+
+    public Notas(Double totalValue, String keyNota,List<Produtos> produtos ,User receivedBy, Empresas empresas,LocalDateTime localDateTime){
         this.totalValue = totalValue;
         this.keyNota = keyNota;
+        this.produtos = produtos;
         this.receivedBy = receivedBy;
         this.dateReceived = localDateTime;
         this.empresas= empresas;

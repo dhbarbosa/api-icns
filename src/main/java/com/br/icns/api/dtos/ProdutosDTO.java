@@ -18,11 +18,7 @@ public record ProdutosDTO(
         LocalDate dataVencimento,
         @NotBlank
         String descricao,
-
         @NotNull
-        Double valorUnitario,
-
-        @Valid
-        NotasDTO notasDTO
+        Double valorUnitario
 ) {
 }

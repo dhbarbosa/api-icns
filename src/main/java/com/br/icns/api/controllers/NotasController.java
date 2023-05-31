@@ -1,10 +1,13 @@
 package com.br.icns.api.controllers;
 import com.br.icns.api.dtos.EmpresasDTO;
 import com.br.icns.api.dtos.NotasDTO;
+import com.br.icns.api.dtos.ProdutosDTO;
 import com.br.icns.api.models.Empresas;
 import com.br.icns.api.models.Notas;
+import com.br.icns.api.models.Produtos;
 import com.br.icns.api.models.User;
 import com.br.icns.api.services.EmpresasService;
+import com.br.icns.api.services.ProdutosService;
 import com.br.icns.api.services.nota.NotasService;
 import com.br.icns.api.services.user.TokenService;
 import com.br.icns.api.services.user.UserService;
@@ -19,6 +22,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -32,6 +37,9 @@ public class NotasController {
     private TokenService tokenService;
     @Autowired
     private EmpresasService empresasService;
+
+    @Autowired
+    private    ProdutosService produtosService;
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
     @GetMapping
@@ -54,25 +62,34 @@ public class NotasController {
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
     @PostMapping
-    public ResponseEntity<Object> saveNota( @Valid @RequestBody NotasDTO notasDTO, HttpServletRequest request){
-        if(notasService.existsNotaByKeyNota(notasDTO.keyNota())){
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("{\"Conflict\":\"A Chave da nota, já está em uso! \"}");
-        }
-
+    public ResponseEntity<Object> saveNota( @RequestBody NotasDTO notasDTO, HttpServletRequest request){
         String bearerToken = request.getHeader("Authorization");
         User user = getUserByToken(bearerToken);
         Optional<Empresas> empresas = Optional.ofNullable(empresasService.findEmpresasByCnpj(notasDTO.empresa().cnpj()));
+
+        if(notasService.existsNotaByKeyNota(notasDTO.keyNota())){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("{\"Conflict\":\"A Chave da nota, já está em uso! \"}");
+        }
         if(empresas.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"Conflict\":\"Cod. da empresa não encontrada \"}");
+        }
+        if(notasDTO.produtos().isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"Conflict\":\"Prod. vazios! \"}");
+        }
+        List<Produtos> produtosList = new ArrayList<>();
+
+        for (ProdutosDTO produtosDTO : notasDTO.produtos()) {
+            Produtos produtos = new Produtos(produtosDTO);
+            produtosList.add(produtosService.save(produtos));
         }
 
         Notas nota = new Notas(
                 notasDTO.totalValue(),
                 notasDTO.keyNota(),
+                produtosList,
                 user,
                 empresas.get(),
                 LocalDateTime.now(ZoneId.of("UTC")));
-
 
         return ResponseEntity.status(HttpStatus.CREATED).body(notasService.save(nota));
     }
