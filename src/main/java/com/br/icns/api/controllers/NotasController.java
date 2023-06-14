@@ -105,7 +105,7 @@ public class NotasController {
             return ResponseEntity.ok().body("{\"message\":\"ok!\"}");
 
         }catch(IllegalArgumentException e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"Conflict\":\""+e.getMessage()+"\"}");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\":\""+e.getMessage()+"\"}");
         }
     }
 
@@ -123,13 +123,13 @@ public class NotasController {
             saveNewNota= notasService.save(saveNewNota);
             return ResponseEntity.ok().body(saveNewNota);
         }catch(IllegalArgumentException e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"Conflict\":\""+e.getMessage()+"\"}");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\":\""+e.getMessage()+"\"}");
         }
     }
 
     private static ResponseEntity<Object> getObjectResponseEntity(Optional<Notas> nota) {
         if(nota.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"Conflict\":\"Não encontrado \"}");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"message\":\"Não encontrado \"}");
         }
         return null;
     }

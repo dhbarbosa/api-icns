@@ -39,7 +39,7 @@ public class ProdutosController {
     public ResponseEntity<Object> getProdutosByCodProduto(@PathVariable String id) {
         Optional<List<Produtos>> produto = Optional.ofNullable(produtosService.findAllProdutosByCodProduto(id));
         if (produto.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"Conflict\":\"Não encontrado \"}");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"message\":\"Não encontrado \"}");
         }
         return ResponseEntity.ok().body(produto.get());
     }
@@ -47,7 +47,7 @@ public class ProdutosController {
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
     @PostMapping
     public ResponseEntity<Object> saveProdutos(@Valid @RequestBody ProdutosDTO produtosDTO) throws IOException {
-//        Optional<Notas> notaExiste = Optional.ofNullable(notasService.findNotasByKeyNota(produtosDTO.notasDTO().keyNota()));
+//        Optional<Notas> notaExiste = Optional.ofNullable(notasService.findNotasByKeyNota(produtos.keyNota()));
 //            if (notaExiste.isEmpty()) {
 //                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"Conflict\":\"Cod. da nota não encontrado \"}");
 //            }
@@ -62,12 +62,12 @@ public class ProdutosController {
         try {
             Optional<Produtos> produtos = Optional.ofNullable(produtosService.findProdutosByIdProdutos(UUID.fromString(uuid)));
             if(produtos.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"Conflict\":\"Não encontrado o Produto com essee UUID. \"}");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"message\":\"Não encontrado o Produto com essee UUID. \"}");
             }
             produtosService.delete(produtos.get());
             return ResponseEntity.ok().body("{\"Mensage\":\"ok\"}");
         }catch (IllegalArgumentException e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"Erro\":\"Id invalido.\"}");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\":\"Id invalido.\"}");
         }
     }
 

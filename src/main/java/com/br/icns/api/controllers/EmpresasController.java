@@ -32,7 +32,7 @@ class EmpresasController {
     @PostMapping
     public ResponseEntity<Object> saveEmpresas(@RequestBody @Valid EmpresasDTO empresasDTO) {
         if(empresasService.existsEmpresasByCpnj(empresasDTO.cnpj())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("{\"Conflict\":\"Empresa já esta cadastrada\"}");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("{\"message\":\"Empresa já esta cadastrada\"}");
         }
         System.out.println(empresasDTO);
         Empresas empresa = new Empresas(empresasDTO.cnpj(),empresasDTO.nomeFantasia(),empresasDTO.email(),empresasDTO.contato());
@@ -44,7 +44,7 @@ class EmpresasController {
     public  ResponseEntity<Object> deleteEmpresa(@PathVariable String cnpj){
         Optional<Empresas> empresa = Optional.ofNullable(empresasService.findEmpresasByCnpj(cnpj));
         if(empresa.isEmpty()){
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("{\"Conflict\":\"Empresa não encontrada\"}");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("{\"message\":\"Empresa não encontrada\"}");
         }
         empresasService.delete(empresa.get());
         return ResponseEntity.ok().body("{\"message\":\"ok!\"}");

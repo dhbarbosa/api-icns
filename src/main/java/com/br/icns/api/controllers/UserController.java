@@ -33,7 +33,7 @@ public class UserController {
     @PostMapping("/cadastro")
     public ResponseEntity<Object> creatNewUser(@RequestBody @Valid UserDTO userDTO){
         if(userService.existsUserByUsername(userDTO.username())){
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("{\"Conflict\":\"O CPF já está em uso!\"}");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\":\"O Usuario já está em uso!\"}");
         }
         userDTO = userDTO.setPassword(passwordEncoder.encode(userDTO.password()));
         Set<Role> roles = Collections.singleton(roleService.findByRoleName(RoleName.ROLE_USER));
@@ -49,7 +49,7 @@ public class UserController {
     public  ResponseEntity<Object> findUser(@PathVariable(name = "id") String cpf){
         Optional<User> user = Optional.ofNullable(userService.findByUsername(cpf));
         if(user.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"Conflict\":\"Não encontrado \"}");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"message\":\"Não encontrado \"}");
         }
         return ResponseEntity.ok().body(user);
     }
@@ -59,7 +59,7 @@ public class UserController {
     public  ResponseEntity<Object> updateUser(@PathVariable(name = "id") String cpf,@RequestBody @Valid UserDTO userDTO){
         Optional<User> user = Optional.ofNullable(userService.findByUsername(cpf));
         if(user.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"Conflict\":\"Não encontrado \"}");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"message\":\"Não encontrado \"}");
         }
         User userUpdate = user.get();
         userUpdate.setDataLastUpdate(LocalDateTime.now(ZoneId.of("UTC")));
